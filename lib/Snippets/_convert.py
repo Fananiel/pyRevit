@@ -29,13 +29,13 @@ def convert_internal_units(length, get_internal=True, unit='m'):
         elif unit == 'm2':  units = UnitTypeId.SquareMeters
 
     else:
+        # Old Method
         from Autodesk.Revit.DB import DisplayUnitType
         if unit == 'm':
             units = DisplayUnitType.DUT_METERS
         elif unit == 'm2':
             units = DisplayUnitType.DUT_SQUARE_METERS
 
-        # Old Method
 
     if get_internal:
         return UnitUtils.ConvertToInternalUnits(length, units)

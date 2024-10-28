@@ -35,7 +35,7 @@ selection = uidoc.Selection                     #type: Selection
 
 # 1. Get selected Elements
 """
-selected_element_ids = uidoc.Selection.GetElementIds()
+selected_element_ids = selection.GetElementIds()
 
 for e_id in selected_element_ids:
     print(e_id)
