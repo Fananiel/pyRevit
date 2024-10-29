@@ -276,15 +276,17 @@ def load_params(p_names_to_load,
                 msg = "Couldn't Find following Parameters: \n{}".format('\n'.join(p_names_to_load))
                 forms.alert(msg, title=__title__)
 
-
-req_params = ['DF_Text', 'DF_Material', 'B_Param 1', 'A_Param 3', 'error']
+req_params = 'Nennspannung'
+#req_params = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Nennstrom', 'Anlaufstrom', 'Waermeentwicklung', 'Aufzugstyp' ]
 missing_params = check_loaded_params(req_params)
+
+print(missing_params)
 
 
 t = Transaction(doc, 'AddSharedParameters')
 t.Start()
 
-bic_cats = [BuiltInCategory.OST_Walls, BuiltInCategory.OST_Floors]
+bic_cats = [BuiltInCategory.OST_TitleBlocks]
 
 load_params(missing_params,
             bic_cats,
