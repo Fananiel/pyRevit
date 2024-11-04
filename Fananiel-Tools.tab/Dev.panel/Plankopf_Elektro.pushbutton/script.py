@@ -8,13 +8,16 @@ Author: Daniel Förster"""
 #⬇ Imports
 from Autodesk.Revit.DB import *
 from pyrevit import forms
-from pyrevit import script
-import os
+from pyrevit.interop.xl import load
+from Autodesk.Revit.UI.Selection import *
+from Snippets._selection import ISelectionFilter_Classes, ISelectionFilter_Categories
+
 
 # 📦 Variables
 app = __revit__.Application
 uidoc = __revit__.ActiveUIDocument
 doc = __revit__.ActiveUIDocument.Document
+selection = uidoc.Selection                     #type: Selection
 
 
 # FUNCTIONS
@@ -55,7 +58,7 @@ def load_params(p_names_to_load,
     #type: (list, list, str, BuiltInParameterGroup) -> None
     """Function to check Loaded Shared Parameters.
     :param p_names_to_load: List of Parameter names
-    :param bic_cats:        List of BuiltInCategories for Parametetrs
+    :param bic_cats:        List of BuiltInCategories for Parameters
     :param bind_mode:       Binding Mode: 'instance' / 'type'
     :param p_group:         BuiltInParameterGroup"""
 
@@ -110,95 +113,6 @@ def load_params(p_names_to_load,
                 msg = "Couldn't Find following Parameters: \n{}".format('\n'.join(p_names_to_load))
                 forms.alert(msg, title=__title__)
 
-
-# MAIN
-
-# req_params = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Nennstrom', 'Anlaufstrom', 'Waermeentwicklung', 'Aufzugstyp' ]
-# missing_params  = check_missing_params(req_params)
-#
-# if missing_params:
-#     # 🔓 Transaction Start
-#     t = Transaction(doc, 'Add SharedParameters')
-#     t.Start()
-#
-#     bic_cats = [BuiltInCategory.OST_Sheets]
-#
-#     load_params(p_names_to_load = missing_params,
-#                 bic_cats        = bic_cats,
-#                 bind_mode       = 'instance',
-#                 p_group         = BuiltInParameterGroup.PG_TITLE)
-#
-#     t.Commit()
-#
-
-# Get the directory where the script is located
-#script_dir = os.path.dirname(__file__)
-
-# Build the path to your CSV file
-#csv_path = os.path.join(script_dir, "my_file.csv")
-# csv_path = "C:\Users\d.foerster\AppData\Roaming\Github pyRevit\Fananiel-Tools.extension\Fananiel-Tools.tab\Dev.panel\Plankopf_Elektro.pushbutton\Elektroangaben_Plankopf_API.csv"
-#
-# # Read the CSV file
-# data = script.load_csv(csv_path)
-#
-# print(data)
-
-# # First let's print what we're getting for a row to understand the structure
-# print("First data row raw:", data[1])
-# print("First data row split:", data[1][0].split(';'))
-#
-# # Split the header by semicolon
-# headers = data[0][0].split(';')
-# print("Headers:", headers)
-#
-# # Convert to dictionary with first column as key
-# data_dict = {}
-# for row in data[1:]:  # Skip header row
-#     # Each row seems to be a list with multiple elements that need to be joined
-#     full_row = ';'.join(row)
-#     values = full_row.split(';')
-#     print("Processing values:", values)
-#
-#     if len(values) >= len(headers):
-#         key = values[0]
-#         row_dict = {}
-#         for i, header in enumerate(headers[1:], 1):
-#             if i < len(values):
-#                 row_dict[header] = values[i]
-#         data_dict[key] = row_dict
-#
-# # Print first entry as example
-# if data_dict:
-#     first_key = list(data_dict.keys())[0]
-#     print("\nFirst entry data:")
-#     print("Key:", first_key)
-#     print("Values:", data_dict[first_key])
-#
-#     # Print structure of first entry
-#     print("\nDetailed structure of first entry:")
-#     print("Available headers:", headers[1:])
-#     print("Available values:", data_dict[first_key].values())
-#     for header in headers[1:]:
-#         value = data_dict[first_key].get(header, 'Not found')
-#         print("{0}: {1}".format(header, value))
-#
-# # Print all entries (optional)
-# print("\nAll entries:")
-# for key, values in data_dict.items():
-#     print("\nKey:", key)
-#     for header, value in values.items():
-#         print("{0}: {1}".format(header, value))
-
-from pyrevit.interop.xl import load, _read_xlsheet
-
-#columns = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Nennstrom', 'Anlaufstrom', 'Waermeentwicklung', 'Aufzugstyp' ]
-
-filepath = "C:\Users\d.foerster\AppData\Roaming\Github pyRevit\Fananiel-Tools.extension\Fananiel-Tools.tab\Dev.panel\Plankopf_Elektro.pushbutton\Elektroangaben_Plankopf_API.xlsx"
-data = load(filepath)
-
-print(data)
-
-
 def transform_elevator_data(input_data):
     """
     Transform elevator data into a dictionary with Aufzugstyp as key.
@@ -225,24 +139,87 @@ def transform_elevator_data(input_data):
 
     return result
 
+# MAIN
 
-# Example usage:
-# input_data = {
-#     'Elektroangaben_Plankopf_API': {
-#         'rows': [row_data],
-#         'headers': ['Aufzugstyp', 'Nennleistung', 'Nennstrom', 'Anlaufstrom',
-#                     'Absicherung', 'Waermeentwicklung', 'Nennfrequenz', 'Nennspannung']
-#     }
-# }
+# Falls notwendig: Laden der benötigten Parameter für den Plankopf und hinzufügen der Parameter zu der Kategorie: Pläne
 
-transformed_data = transform_elevator_data(data)
+req_params = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Nennstrom', 'Anlaufstrom', 'Waermeentwicklung', 'Aufzugstyp']
+missing_params  = check_missing_params(req_params)
 
-print('#'*100)
+if missing_params:
+    # 🔓 Transaction Start
+    t = Transaction(doc, 'Add SharedParameters')
+    t.Start()
 
-print(transformed_data)
+    bic_cats = [BuiltInCategory.OST_Sheets]
 
-print('#'*100)
+    load_params(p_names_to_load = missing_params,
+                bic_cats        = bic_cats,
+                bind_mode       = 'instance',
+                p_group         = BuiltInParameterGroup.PG_TEXT)
 
-print(transformed_data['1000-MDL-BT10-ZS'])
-print(transformed_data['1400-MDL-BT11-ZS'])
+    t.Commit()
 
+
+# Importieren der Excel-Datei
+
+filepath = "C:\Users\d.foerster\AppData\Roaming\Github pyRevit\Fananiel-Tools.extension\Fananiel-Tools.tab\Dev.panel\Plankopf_Elektro.pushbutton\Elektroangaben_Plankopf_API.xlsx"
+data = load(filepath)
+
+# Umwandeln der Tabelle in ein Dictionary mit key: Aufzugstyp
+
+data = transform_elevator_data(data)
+
+# User muss aus Aufzugstypen wählen
+
+keysList = list(data.keys())
+keysList.sort()
+
+selected_option = forms.CommandSwitchWindow.show(
+    keysList,
+     message='Wählen sie den Aufzugstyp:',
+)
+
+aufzugsdaten = data[selected_option]
+param_list_exc = list(aufzugsdaten.keys())
+
+param_list = []
+
+# Wählen des Plans
+
+selected_sheets = forms.select_sheets()
+for sheet in selected_sheets:
+    for param in param_list_exc:
+        param_list.append(sheet.LookupParameter(param))
+
+print(param_list)
+
+# Setzen der Parameter
+
+t = Transaction(doc, 'Set Parameters')
+t.Start()
+for param in param_list:
+    param_Name = param.Definition.Name
+    wert = aufzugsdaten[param_Name]
+
+    # Modifizieren der Werte
+    if type(wert) is float:
+        wert = round(wert, 1)
+    wert = str(wert)
+    wert = wert.replace('.', ',')
+
+    # Einheiten
+
+    A_list = ['Absicherung', 'Nennstrom', 'Anlaufstrom']
+    if param_Name in A_list:
+        wert = wert + ' A'
+
+    elif param_Name == 'Nennleistung':
+        wert = wert + ' kVA'
+
+    elif param_Name == 'Waermeentwicklung':
+        wert = wert + ' W'
+
+    param.Set(wert)
+    print('{} :  {}'.format(param_Name, wert))
+t.Commit()
