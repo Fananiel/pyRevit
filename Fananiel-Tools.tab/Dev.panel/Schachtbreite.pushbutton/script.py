@@ -75,7 +75,8 @@ try:
     TS2_Dim = doc.Create.NewDimension(doc.ActiveView, dimline_2, ref2)  # type: Dimension
 
     t.Commit()
-except:
+except Exception as e:
+    print("An error occured: {}".format(e))
     t.RollBack()
 
 

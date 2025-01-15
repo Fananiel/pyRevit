@@ -10,8 +10,6 @@ from Autodesk.Revit.DB import *
 from pyrevit import forms
 from pyrevit.interop.xl import load
 from Autodesk.Revit.UI.Selection import *
-from Snippets._selection import ISelectionFilter_Classes, ISelectionFilter_Categories
-
 
 # 📦 Variables
 app = __revit__.Application
@@ -139,11 +137,20 @@ def transform_elevator_data(input_data):
 
     return result
 
-# MAIN
 
+# MAIN
 # Falls notwendig: Laden der benötigten Parameter für den Plankopf und hinzufügen der Parameter zu der Kategorie: Pläne
 
-req_params = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Nennstrom', 'Anlaufstrom', 'Waermeentwicklung', 'Aufzugstyp']
+req_params = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Nennstrom', 'Anlaufstrom', 'Waermeentwicklung', 'Aufzugstyp',
+              'Schneelastzone_sk', 'Schneelastzone', 'Windzone', 'Windzone_vb,0', 'Windzone_qb', 'Erdbebenzone', 'HGV-Text',
+              'FF1_K', 'FF2_K',	'FF1_GGW', 'FF2_GGW',	'F1_Plan',	'F2_Plan',	'F3_Plan',	'F4_Plan',	'F5_Plan',	'F8_Plan',	'F9_Plan',
+              'F10_Plan',	'F14_Plan',	'F15_Plan',	'F16_Plan',	'F17_Plan',	'F18_Plan',
+              'TRAGKRAFT', 'Personenzahl', 'FOERDERHOEHE', 'Geschwindigkeit', 'Anzahl Haltestellen', 'Anzahl Schachtzugänge',
+              'PLN_Bauherr_Adresse_Zeile1', 'PLN_Bauherr_Adresse_Zeile2','PLN_Bauherr_Adresse_Zeile3',
+              'Erdung_Text', 'Notruf_Text', 'Planungsgrundlage Text', 'PLN_Projektbezeichnung_Zeile1', 'PLN_Projektnummer',
+              'PLN_Planungsphase', 'Planbezeichnung', 'Planart', 'PLN_Plannummer', 'Strecke_Bezeichnung', 'Strecke_Nr.', 'Stations_km', 'Bahnhofs-Nr.',
+              'Planersteller', 'Datum', 'Datum Zeichner', 'CAD_Zeichner', 'CAD_Prüfer', 'CAD_Prüfer_Datum']
+
 missing_params  = check_missing_params(req_params)
 
 if missing_params:
@@ -163,7 +170,8 @@ if missing_params:
 
 # Importieren der Excel-Datei
 
-filepath = "C:\Users\d.foerster\AppData\Roaming\Github pyRevit\Fananiel-Tools.extension\Fananiel-Tools.tab\Dev.panel\Plankopf_Elektro.pushbutton\Elektroangaben_Plankopf_API.xlsx"
+
+filepath = r"N:\F-KA-Plandaten\170-079 Deutsche Bahn Rahmenvertrag\170-079-000 Sonstiges\Revit\Elektroangaben_Plankopf_API.xlsx"
 data = load(filepath)
 
 # Umwandeln der Tabelle in ein Dictionary mit key: Aufzugstyp
@@ -192,34 +200,45 @@ for sheet in selected_sheets:
     for param in param_list_exc:
         param_list.append(sheet.LookupParameter(param))
 
-print(param_list)
-
 # Setzen der Parameter
 
 t = Transaction(doc, 'Set Parameters')
 t.Start()
 for param in param_list:
-    param_Name = param.Definition.Name
-    wert = aufzugsdaten[param_Name]
+    if param:
+        param_Name = param.Definition.Name
+        wert = aufzugsdaten[param_Name]
 
-    # Modifizieren der Werte
-    if type(wert) is float:
-        wert = round(wert, 1)
-    wert = str(wert)
-    wert = wert.replace('.', ',')
+        # Modifizieren der Werte
 
-    # Einheiten
+        if type(wert) == float:
+            wert = round(wert, 1)
+        if param_Name == 'Personenzahl':
+            wert = int(wert)
+        else:
+            wert = str(wert)
+            wert = wert.replace('.', ',')
 
-    A_list = ['Absicherung', 'Nennstrom', 'Anlaufstrom']
-    if param_Name in A_list:
-        wert = wert + ' A'
+        # Einheiten
+        A_list = ['Absicherung', 'Nennstrom', 'Anlaufstrom']
+        if param_Name in A_list:
+            wert = wert + ' A'
 
-    elif param_Name == 'Nennleistung':
-        wert = wert + ' kVA'
+        elif param_Name == 'Nennleistung':
+            wert = wert + ' kVA'
 
-    elif param_Name == 'Waermeentwicklung':
-        wert = wert + ' W'
+        elif param_Name == 'Waermeentwicklung':
+            wert = wert + ' W'
 
-    param.Set(wert)
-    print('{} :  {}'.format(param_Name, wert))
+        elif param_Name == 'Tragfähigkeit':
+            wert = wert + ' kg'
+
+        elif param_Name == 'Personenzahl' or param_Name == 'Aufzugstyp':
+            wert = wert
+
+        else:
+            if wert != '-':
+                wert = wert + ' kN'
+
+        param.Set(wert)
 t.Commit()
