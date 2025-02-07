@@ -30,7 +30,7 @@ selection = uidoc.Selection                     #type: Selection
 #==================================================
 
 #Ebenen
-
+"""
 filter_cats       = ISelectionFilter_Categories([BuiltInCategory.OST_Levels])
 Ebene_SG = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der Schachtgrube!")
 Ebene_0 = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der unteren Haltestelle!")
@@ -55,8 +55,30 @@ SK_ref.Append(Ebene_SK)
 SH_ref = ReferenceArray()
 SH_ref.Append(Ebene_SG)
 SH_ref.Append(Ebene_SK)
+"""
+
+# Let user pick a view
+selected_view = forms.select_views(title='Select View', multiple=False)
+if not selected_view:
+    print("No view was selected. Exiting.")
+    import sys
+    sys.exit()
+
+print("Selected view: {}".format(selected_view.Title))
+print(selected_view.Origin)
+print(selected_view.SketchPlane)
+print(selected_view.CropBox)
 
 
+# Referenzebene auswählen
+filter_cats_ref = ISelectionFilter_Categories([BuiltInCategory.OST_CLines])
+Ebene_ref = selection.PickObject(ObjectType.Element, filter_cats_ref, "Wählen sie die Referenzebene!")
+elem = doc.GetElement(Ebene_ref)
+print(elem.Direction)
+
+
+
+"""
 # Pick point for dimline
 
 selected_point = selection.PickPoint("Platzieren sie die Maßlinien")
@@ -67,7 +89,6 @@ offset = convert_internal_units(0.5, True, 'm')
 dimline_sh = dimline.CreateOffset(offset, XYZ(-1, 0, 0))
 
 # Transaction
-
 t = Transaction(doc, __title__)
 t.Start()
 try:
@@ -102,3 +123,4 @@ except:
 # for level in levels_:
 #     levels_ref.Append(level.GetPlaneReference())
 
+"""
