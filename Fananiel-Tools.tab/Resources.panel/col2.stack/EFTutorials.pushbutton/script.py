@@ -20,7 +20,7 @@ Author: Erik Frits from LearnRevitAPI.com"""
 # ╩╩ ╩╩  ╚═╝╩╚═ ╩ ╚═╝ IMPORTS
 #====================================================================================================
 from Autodesk.Revit.DB import *
-from pyrevit import forms   # By importing forms you also get references to WPF package! Very IMPORTANT
+from pyrevit import forms   # By importing forms you also get references to WPF.pushbutton package! Very IMPORTANT
 import wpf, os, clr         # wpf can be imported only after pyrevit.forms!
 
 # .NET Imports

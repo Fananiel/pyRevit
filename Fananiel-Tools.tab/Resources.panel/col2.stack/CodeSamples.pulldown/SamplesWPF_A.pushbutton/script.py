@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-__title__   = "Code Samples: WPF Form Sample"
+__title__   = "Code Samples: WPF.pushbutton Form Sample"
 __doc__ = """Version = 1.0
 Date    = 15.07.2024
 _____________________________________________________________________
 Description:
-Example of using WPF Form.
-Keep in mind that WPF forms need a .xaml file that has the form design.
+Example of using WPF.pushbutton Form.
+Keep in mind that WPF.pushbutton forms need a .xaml file that has the form design.
 _____________________________________________________________________
 How-To:
 - Click the Button
@@ -21,7 +21,7 @@ Author: Erik Frits from LearnRevitAPI.com"""
 # ╩╩ ╩╩  ╚═╝╩╚═ ╩ ╚═╝ IMPORTS
 #====================================================================================================
 from Autodesk.Revit.DB import *
-from pyrevit import forms   # By importing forms you also get references to WPF package! Very IMPORTANT
+from pyrevit import forms   # By importing forms you also get references to WPF.pushbutton package! Very IMPORTANT
 import wpf, os, clr         # wpf can be imported only after pyrevit.forms!
 
 # .NET Imports
@@ -205,7 +205,7 @@ sel_listbox_item = UI.UI_listbox.SelectedItem
 from pyrevit import script
 output = script.get_output()
 
-output.print_md('## Selected Values in EF-WPF Form:')
+output.print_md('## Selected Values in EF-WPF.pushbutton Form:')
 output.print_md('**TextBox 1:** {}'.format(text_1))
 output.print_md('**TextBox 2:** {}'.format(text_2))
 
