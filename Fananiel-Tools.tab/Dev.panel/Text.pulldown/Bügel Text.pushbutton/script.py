@@ -23,6 +23,7 @@ from Autodesk.Revit.DB import *
 from pyrevit import forms   # By importing forms you also get references to WPF package! IT'S Very IMPORTANT !!!
 import wpf, os# wpf can be imported only after pyrevit.forms!
 import clr
+from Snippets._text import *
 
 # .NET Imports
 clr.AddReference("System")
@@ -62,7 +63,7 @@ class DF_ComboDock():
         text_block.Margin = Thickness(0, 2.5, 5, 0)
 
         self.combobox = ComboBox()
-        items = ["Dübel", "HM"]
+        items = ["Dübel", "HM", "HTA", "HM (Bestand)", "HTA (Bestand)"]
         for item in items:
             self.combobox.Items.Add(item)
         self.combobox.SelectedIndex = 0
@@ -96,11 +97,11 @@ class UI_Fenster(Window):
 
         self.stack = StackPanel(Margin=Thickness(10))
         self.brackets = brackets
-        self.combo_controls = []  # Liste für die Kontrollelemente
+        self.combo_controls = {}  # Dictionary für die Kontrollelemente
 
         for i, bracket in enumerate(brackets, 1):
             combo_dock = DF_ComboDock(counter=i, bracket=bracket)
-            self.combo_controls.append(combo_dock)  # Speichere die Kontrollelemente
+            self.combo_controls[bracket] = combo_dock  # Speichere die Kontrollelemente
             self.stack.Children.Add(combo_dock.control)
 
         # 🟧 Create Separator
@@ -127,6 +128,12 @@ class UI_Fenster(Window):
 # ╚═╝╚═╝╚═╝  ╚  ╚═╝╩╚═╩ ╩
 #====================================================================================================
 
+plan_texte = {"Dübel": 'Schienenbügel mittels Dübel befestigen \n(AN FA)',
+              "HM": 'Schienenbügel mittels HM 40/22/2550 befestigen \n(AN FA)',
+              "HTA": 'Schienenbügel mittels HTA 40/22/2550 befestigen \n(AN FA)',
+              "HM (Bestand)": 'Schienenbügel an HM Bestand befestigen \n(AN FA)',
+              "HTA (Bestand)": 'Schienenbügel an HTA Bestand befestigen \n(AN FA)'}
+
 view = doc.ActiveView
 
 # Schienenbügel filtern
@@ -142,10 +149,20 @@ sorted_brackets = sorted(all_brackets, key=lambda x: x.get_BoundingBox(view).Min
 
 UI = UI_Fenster(sorted_brackets)
 
-print('Outside:')
-for combo_control in UI.combo_controls:
-    selected_value = combo_control.value
-    bracket = combo_control.bracket
-    print(combo_control.counter)
-    print("Ausgewählter Wert: {}".format(selected_value))
+text_type = get_text_type_from_user(doc)
+
+if not text_type:
+    forms.alert('No text type selected', exitscript=True)
+
+# Create text note creator instance
+creator = TextNoteCreator(doc, view, text_type.Id)
+
+try:
+    for bracket in sorted_brackets:
+        UI_value = UI.combo_controls[bracket].value
+        text = plan_texte[UI_value]
+        creator.create_text_note(bracket, text)
+except Exception as ex:
+    print('Error: {0}'.format(str(ex)))
+
 
