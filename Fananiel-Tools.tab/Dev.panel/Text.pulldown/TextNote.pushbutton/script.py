@@ -72,8 +72,6 @@ def text_note_from_param(picked_object):
 
     # Text Options
     text_opt = TextNoteOptions(text_type_id)
-
-
     # Text Position
     if view_type == ViewType.Elevation:
         if ref_plane:
@@ -92,8 +90,31 @@ def text_note_from_param(picked_object):
         else:
             text_pos = bb_max + XYZ(25, 0, 4)
             print('Referenzebene Mitte AZ BS nicht gefunden!')
-
-    if view_type == ViewType.FloorPlan:
+    elif view_type == ViewType.Section:
+        if ref_plane:
+            # Get Middle Ref Plane
+            ref_planes = FilteredElementCollector(doc).OfCategory(
+                BuiltInCategory.OST_CLines).WhereElementIsNotElementType().ToElements()
+            ref_plane = None
+            for rp in ref_planes:
+                if rp.Name == 'Mitte AZ TS':
+                    ref_plane = rp
+            mid_plane = ref_plane.get_BoundingBox(active_view)
+            side_check = mid_plane.Min.Y - bb_max.Y
+            # Left Side
+            if side_check > 0:
+                text_pos = lo_ecke + XYZ(0, -25, 4)
+                text_opt.HorizontalAlignment = HorizontalTextAlignment.Right
+                leader_end = lo_ecke
+            # Right Side
+            else:
+                text_pos = bb_max + XYZ(0, 25, 4)
+                text_opt.HorizontalAlignment = HorizontalTextAlignment.Left
+                leader_end = bb_max
+        else:
+            text_pos = bb_max + XYZ(0, 25, 4)
+            print('Referenzebene Mitte AZ BS nicht gefunden!')
+    elif view_type == ViewType.FloorPlan:
         if ref_plane:
             mid_plane = ref_plane.get_BoundingBox(active_view)
             side_check = mid_plane.Min.X - bb_max.X

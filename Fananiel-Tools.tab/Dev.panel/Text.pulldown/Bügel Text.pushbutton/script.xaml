@@ -1,0 +1,45 @@
+<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Schienenbügel" Height="Auto" Width="400" MinHeight="125"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        SizeToContent="Height">
+
+    <!--Stack Panel for all elements-->
+    <StackPanel Margin="10">
+        <!--First Label and TextBox-->
+        <DockPanel Margin="5">
+            <TextBlock Text="Wählen sie die Befestigung der Schienenbügel aus:" Margin="0,0,10,0" FontWeight="Bold"/>
+        </DockPanel>
+
+        <!--ListBox of Random Views-->
+        <StackPanel x:Name="UI_stack" Margin="5">
+            <!--<DockPanel>
+                <TextBlock Text="Bügel 1:"/>
+                <ComboBox x:Name="UI_combobox" Width="200" Margin="40,0,0,0">
+                    <ComboBoxItem Content="Dübel" IsSelected="True"/>
+                </ComboBox>
+            </DockPanel>
+
+            <DockPanel>
+                <TextBlock Text="Bügel 2:"/>
+                <ComboBox x:Name="UI_combobox2" Width="200" Margin="40,0,0,0">
+                    <ComboBoxItem Content="Dübel" IsSelected="True"/>
+                </ComboBox>
+            </DockPanel>
+
+            <DockPanel>
+                <TextBlock Text="Bügel 3:"/>
+                <ComboBox x:Name="UI_combobox3" Width="200" Margin="40,0,0,0">
+                    <ComboBoxItem Content="Dübel" IsSelected="True"/>
+                </ComboBox>
+            </DockPanel>-->
+
+        </StackPanel>
+        <!--Separator-->
+        <Separator Margin="5,5,5,12"/>
+
+        <!--Submit Button-->
+        <Button Content="Fertig" Width="100" Click="UIe_btn_run"/>
+    </StackPanel>
+</Window>

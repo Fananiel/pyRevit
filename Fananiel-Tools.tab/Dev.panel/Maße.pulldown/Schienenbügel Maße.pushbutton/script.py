@@ -15,6 +15,7 @@ from Autodesk.Revit.UI.Selection import *
 from Snippets._selection import ISelectionFilter_Categories
 from Snippets._convert import convert_internal_units
 
+
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
 #  ╚╝ ╩ ╩╩╚═╩╩ ╩╚═╝╩═╝╚═╝╚═╝
@@ -57,8 +58,11 @@ view = doc.ActiveView
 
 # Schienenbügel filtern
 
-all_allgmodel   = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_SpecialityEquipment).ToElements()
+all_allgmodel   = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
 all_brackets    = [m for m in all_allgmodel if check_type(m,"LDXRailBracket")]
+
+if len(all_brackets) == 0:
+    forms.alert('Es wurden keine Schienenbügel gefunden.', exitscript=True)
 
 # Famdoc for each bracket
 for brack in all_brackets:
