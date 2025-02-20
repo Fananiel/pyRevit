@@ -55,3 +55,9 @@ class ISelectionFilter_Categories(ISelectionFilter):
         # self.allowed_categories = [ElementId(bic) for bic in self.allowed_categories]
         # if element.Category.Id in self.allowed_categories:
         #     return True
+
+
+def check_type(element, keyword):
+    el_type = element.get_Parameter(BuiltInParameter.ELEM_TYPE_PARAM).AsValueString()
+    if keyword.lower() in el_type.lower():
+        return True

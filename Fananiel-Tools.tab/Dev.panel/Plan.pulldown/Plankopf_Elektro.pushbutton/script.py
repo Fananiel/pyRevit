@@ -139,7 +139,7 @@ def transform_elevator_data(input_data):
 
 
 # MAIN
-# Falls notwendig: Laden der benötigten Parameter für den Plankopf.pulldown und hinzufügen der Parameter zu der Kategorie: Pläne
+# Falls notwendig: Laden der benötigten Parameter für den Plan.pulldown und hinzufügen der Parameter zu der Kategorie: Pläne
 
 req_params = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Nennstrom', 'Anlaufstrom', 'Waermeentwicklung', 'Aufzugstyp',
               'Schneelastzone_sk', 'Schneelastzone', 'Windzone', 'Windzone_vb,0', 'Windzone_qb', 'Erdbebenzone', 'HGV-Text',
