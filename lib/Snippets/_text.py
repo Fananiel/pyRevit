@@ -87,7 +87,11 @@ class TextNoteCreator(object):
 
     def _get_text_from_parameters(self, element):
         """Extracts and combines text from element parameters"""
-        text = element.LookupParameter('Beschriftungstext').AsString()
+        text = element.LookupParameter('Beschriftungstext')
+        if text:
+            text = text.AsString()
+        else:
+            print('{} hat keinen Parameter Beschriftungstext'.format(element.Name))
 
         # Handle special case for DB_Ankerschiene family
         if element.LookupParameter('Familie').AsValueString() == 'DB_Ankerschiene':
@@ -178,6 +182,8 @@ class TextNoteCreator(object):
             text = text
         else:
             text = self._get_text_from_parameters(element)
+            if not text:
+                return
         bbox = element.get_BoundingBox(self.active_view)
         ref_plane_bbox = self.reference_plane.get_BoundingBox(self.active_view) if self.reference_plane else None
 

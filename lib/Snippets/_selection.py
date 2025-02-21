@@ -61,3 +61,9 @@ def check_type(element, keyword):
     el_type = element.get_Parameter(BuiltInParameter.ELEM_TYPE_PARAM).AsValueString()
     if keyword.lower() in el_type.lower():
         return True
+
+
+def check_family(element, keyword):
+    el_type = element.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString()
+    if keyword.lower() in el_type.lower():
+        return True

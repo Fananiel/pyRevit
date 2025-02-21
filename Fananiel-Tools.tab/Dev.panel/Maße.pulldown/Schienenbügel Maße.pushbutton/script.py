@@ -53,8 +53,15 @@ def check_type(element, keyword):
 # ║║║╠═╣║║║║
 # ╩ ╩╩ ╩╩╝╚╝
 #==================================================
-
+# Ansicht
 view = doc.ActiveView
+
+
+# Bemaßungsstil
+dim_type_group = ElementTypeGroup.SpotElevationType
+p = BuiltInParameter.ALL_MODEL_TYPE_NAME
+alle_stile = FilteredElementCollector(doc).WhereElementIsElementType().ToElements()
+bm_stil = [dt for dt in FilteredElementCollector(doc).OfClass(DimensionType) if dt.get_Parameter(p).AsString() == 'Standard 3mm'][0]
 
 # Schienenbügel filtern
 
@@ -121,7 +128,7 @@ t = Transaction(doc, __title__)
 t.Start()
 try:
     #Changes
-    SG_Dim = doc.Create.NewDimension(view, dimline, SG_ref) #type: Dimension
+    SG_Dim = doc.Create.NewDimension(view, dimline, SG_ref, bm_stil) #type: Dimension
     t.Commit()
 except Exception as e:
     print(e)
