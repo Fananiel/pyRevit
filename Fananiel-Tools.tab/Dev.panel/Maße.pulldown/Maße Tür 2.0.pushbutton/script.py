@@ -105,25 +105,40 @@ for tz in all_tz:
         ref_u = tz.GetReferences(FamilyInstanceReferenceType.Left)
         ref_o = tz.GetReferences(FamilyInstanceReferenceType.Right)
         prefix = 'BT'
+
+        # Reference Array
+        SG_ref = ReferenceArray()
+        SG_ref.Append(ref_u[0])
+        SG_ref.Append(ref_o[0])
+
+        # curve for dimline
+        pos_tz = tz.get_BoundingBox(view).Max
+        side = check_side(view_up, pos_tz, ref_bb)
+        if side == False:
+            point_1 = pos_tz - 10 * view_up
+            point_2 = point_1 + 10 * view_dir
+        else:
+            point_1 = pos_tz + 10 * view_up
+            point_2 = point_1 - 10 * view_dir
     else:
         ref_u = tz.GetReferences(FamilyInstanceReferenceType.Bottom)
         ref_o = tz.GetReferences(FamilyInstanceReferenceType.Top)
         prefix = 'HT'
 
-    # Reference Array
-    SG_ref = ReferenceArray()
-    SG_ref.Append(ref_u[0])
-    SG_ref.Append(ref_o[0])
+        # Reference Array
+        SG_ref = ReferenceArray()
+        SG_ref.Append(ref_u[0])
+        SG_ref.Append(ref_o[0])
 
-    # curve for dimline
-    pos_tz = tz.get_BoundingBox(view).Max
-    side = check_side(view_dir, pos_tz, ref_bb)
-    if side == False:
-        point_1 = pos_tz + 20 * view_dir
-        point_2 = point_1 + 10 * view_up
-    else:
-        point_1 = pos_tz - 20 * view_dir
-        point_2 = point_1 - 10 * view_up
+        # curve for dimline
+        pos_tz = tz.get_BoundingBox(view).Max
+        side = check_side(view_dir, pos_tz, ref_bb)
+        if side == False:
+            point_1 = pos_tz + 20 * view_dir
+            point_2 = point_1 + 10 * view_up
+        else:
+            point_1 = pos_tz - 20 * view_dir
+            point_2 = point_1 - 10 * view_up
 
     dimline = Line.CreateBound(point_1, point_2)
 
