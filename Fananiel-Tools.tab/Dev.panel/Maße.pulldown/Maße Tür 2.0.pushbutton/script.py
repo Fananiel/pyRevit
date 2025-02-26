@@ -126,6 +126,8 @@ for tz in all_tz:
         prefix = 'HT'
 
         # Reference Array
+        print(ref_u)
+        print(ref_o)
         SG_ref = ReferenceArray()
         SG_ref.Append(ref_u[0])
         SG_ref.Append(ref_o[0])

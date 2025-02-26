@@ -40,8 +40,10 @@ view = doc.ActiveView
 all_allgmodel   = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
 ph_rollstuhl    = [m for m in all_allgmodel if check_type(m,"Rollstuhl")]
 ph_aufzug       = [m for m in all_allgmodel if check_type(m,"Aufzug")]
+ph_sev       = [m for m in all_allgmodel if check_type(m,"SEV")]
 
-phs = ph_rollstuhl + ph_aufzug
+
+phs = ph_rollstuhl + ph_aufzug + ph_sev
 
 for el in phs:
 
@@ -53,8 +55,10 @@ for el in phs:
     import_options = ImagePlacementOptions(loc_point, BoxPlacement.Center)
     if check_type(el,"Rollstuhl"):
         new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_einzeln\Material\Rollstuhl.jpg"
-    else:
+    elif check_type(el,"Aufzug"):
         new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_einzeln\Material\Aufzug.jpg"
+    elif check_type(el,"SEV"):
+        new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_einzeln\Material\SEV.jpg"
     im_type_opt = ImageTypeOptions(new_img_path, True, ImageTypeSource.Import)
 
     # Create New Image in Revit
