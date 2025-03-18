@@ -11,11 +11,8 @@ Author: Daniel Förster"""
 #==================================================
 from Autodesk.Revit.DB import *
 from Autodesk.Revit.UI.Selection import *
-from Snippets._selection import check_type
-
-#.NET Imports
-import clr
-from clr import StrongBox
+from Snippets._selection import check_type, ISelectionFilter_Categories
+from pyrevit import forms
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
@@ -35,12 +32,14 @@ view = doc.ActiveView
 
 # Pick object
 
-# Rollstuhl filtern
+filter_cats_ref = ISelectionFilter_Categories([BuiltInCategory.OST_GenericModel])
+all_allgmodel = selection.PickObjects(ObjectType.Element, filter_cats_ref, "Wählen sie die Piktgogramme!")
 
-all_allgmodel   = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
+# Platzhalter filtern
+#all_allgmodel   = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
 ph_rollstuhl    = [m for m in all_allgmodel if check_type(m,"Rollstuhl")]
 ph_aufzug       = [m for m in all_allgmodel if check_type(m,"Aufzug")]
-ph_sev       = [m for m in all_allgmodel if check_type(m,"SEV")]
+ph_sev       = [m for m in all_allgmodel if check_type(m,"Divers")]
 
 
 phs = ph_rollstuhl + ph_aufzug + ph_sev
@@ -54,11 +53,11 @@ for el in phs:
     # Import Options
     import_options = ImagePlacementOptions(loc_point, BoxPlacement.Center)
     if check_type(el,"Rollstuhl"):
-        new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_einzeln\Material\Rollstuhl.jpg"
+        new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_jpg\Rollstuhl.jpg"
     elif check_type(el,"Aufzug"):
-        new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_einzeln\Material\Aufzug.jpg"
-    elif check_type(el,"SEV"):
-        new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_einzeln\Material\SEV.jpg"
+        new_img_path = r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_jpg\Aufzug.jpg"
+    elif check_type(el,"Divers"):
+        new_img_path = forms.pick_file(init_dir=r"N:\F-KA-Plandaten\000- Revit Familien FC\02 Aufzüge\Deutsche Bahn Sonderteile\Piktogramme\Piktogramme_jpg")
     im_type_opt = ImageTypeOptions(new_img_path, True, ImageTypeSource.Import)
 
     # Create New Image in Revit

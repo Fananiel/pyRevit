@@ -30,7 +30,7 @@ selection = uidoc.Selection                     #type: Selection
 #==================================================
 
 #Ebenen
-"""
+
 filter_cats       = ISelectionFilter_Categories([BuiltInCategory.OST_Levels])
 Ebene_SG = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der Schachtgrube!")
 Ebene_0 = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der unteren Haltestelle!")
@@ -55,8 +55,8 @@ SK_ref.Append(Ebene_SK)
 SH_ref = ReferenceArray()
 SH_ref.Append(Ebene_SG)
 SH_ref.Append(Ebene_SK)
-"""
 
+"""
 # Let user pick a view
 selected_view = forms.select_views(title='Select View', multiple=False)
 if not selected_view:
@@ -123,4 +123,3 @@ except:
 # for level in levels_:
 #     levels_ref.Append(level.GetPlaneReference())
 
-"""
