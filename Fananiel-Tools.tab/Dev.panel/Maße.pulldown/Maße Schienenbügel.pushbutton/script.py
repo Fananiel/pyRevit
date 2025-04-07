@@ -71,39 +71,52 @@ all_brackets    = [m for m in all_allgmodel if check_type(m,"LDXRailBracket")]
 if len(all_brackets) == 0:
     forms.alert('Es wurden keine Schienenbügel gefunden.', exitscript=True)
 
-# Famdoc for each bracket
-for brack in all_brackets:
-    fam_id = (brack.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsElementId())
-    fam_sym = doc.GetElement(fam_id)
-    fam = fam_sym.Family
-    famdoc = doc.EditFamily(fam)
-
-    # Get Ref Planes
-    all_refplanes = FilteredElementCollector(famdoc).OfCategory(BuiltInCategory.OST_CLines).ToElements()
-
-    #Modify the center elevation
-    for rp in all_refplanes:
-        if rp.Normal.Z == 1:
-            ref_name = rp.LookupParameter('Ist eine Referenz')
-            ref_name.Set(int(7))
-
-    opt = FamilyLoadOptions()
-
-    family = famdoc.LoadFamily(doc, opt)
-
-# Z-Referenz der Schienenbügel auslesen
-
 elevations = []
-for b in all_brackets:
-    refs = b.GetReferences(FamilyInstanceReferenceType.CenterElevation)
-    if refs:
-        elevations.append(refs[0])
 
-print(elevations)
+# Abfrage der Ref_Ebene 'Befestigung' für alle Schienenbügel
 
-filter_cats       = ISelectionFilter_Categories([BuiltInCategory.OST_Levels])
-Ebene_SG = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der Schachtgrube!")
+for brack in all_brackets:
+    ref = brack.GetReferenceByName('Befestigung')
 
+    if ref:
+        elevations.append(ref)
+
+    # Falls nicht vorhanden: Erstellen der RefEbene in jedem Schienenbügel
+    else:
+        fam_id = (brack.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsElementId())
+        fam_sym = doc.GetElement(fam_id)
+        fam = fam_sym.Family
+        famdoc = doc.EditFamily(fam)
+
+        z = convert_internal_units(0.02)
+        b_end = XYZ(-10, -10, -z)
+        f_end = XYZ(10, 10, -z)
+        c_vec = XYZ(0, 0, 1)
+
+        all_views = FilteredElementCollector(famdoc).OfCategory(BuiltInCategory.OST_Views).WhereElementIsNotElementType().ToElements()
+        elev = [view for view in all_views if view.ViewType == ViewType.Elevation]
+
+        t = Transaction(famdoc, 'Schienenbügel Referenz')
+        t.Start()
+        ref_plane = famdoc.FamilyCreate.NewReferencePlane(b_end, f_end, c_vec, elev[0])
+        ref_plane.Name = 'Befestigung'
+        t.Commit()
+
+        opt = FamilyLoadOptions()
+
+        family = famdoc.LoadFamily(doc, opt)
+
+        elevations.append(brack.GetReferenceByName('Befestigung'))
+
+# Ebenen filtern
+
+ebenen  = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements()
+Ebene_SG = [eb for eb in ebenen if eb.Name == 'Schachtgrube']
+
+if len(Ebene_SG) == 0:
+    forms.alert('Die Ebene Schachtgrube wurde nicht gefunden.', exitscript=True)
+
+Ebene_SG = Ebene_SG[0].GetPlaneReference()
 
 # Reference Arrays
 

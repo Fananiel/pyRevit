@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 __title__   = "Maße Höhe"
-__doc__     = """Version = 1.0
-Date    = 28.10.2024
+__doc__     = """Version = 2.0
+Date    = 26.03.2025
 ________________________________________________________________
 Author: Daniel Förster"""
 
@@ -29,14 +29,30 @@ selection = uidoc.Selection                     #type: Selection
 # ╩ ╩╩ ╩╩╝╚╝
 #==================================================
 
+view = doc.ActiveView
+
 #Ebenen
 
-filter_cats       = ISelectionFilter_Categories([BuiltInCategory.OST_Levels])
-Ebene_SG = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der Schachtgrube!")
-Ebene_0 = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der unteren Haltestelle!")
-Ebene_1 = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene der oberen Haltestelle!")
-Ebene_SK = selection.PickObject(ObjectType.Element, filter_cats, "Wählen sie die Ebene des Schachtkopfs!")
+# Schachtgrube
+ebenen  = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements()
+Ebene_SG = [eb for eb in ebenen if eb.Name == 'Schachtgrube']
 
+if len(Ebene_SG) == 0:
+    forms.alert('Die Ebene Schachtgrube wurde nicht gefunden.', exitscript=True)
+
+Ebene_SG = Ebene_SG[0].GetPlaneReference()
+
+# Schachtkopf
+Ebene_SK = [eb for eb in ebenen if eb.Name == 'Schachtkopf']
+
+if len(Ebene_SK) == 0:
+    forms.alert('Die Ebene Schachtkopf wurde nicht gefunden.', exitscript=True)
+
+Ebene_SK = Ebene_SK[0].GetPlaneReference()
+
+cats = ISelectionFilter_Categories([BuiltInCategory.OST_Levels])
+Ebene_0 = selection.PickObject(ObjectType.Element, cats,'Wählen sie die untere Haltestelle')
+Ebene_1 = selection.PickObject(ObjectType.Element, cats,'Wählen sie die obere Haltestelle')
 
 # Reference Arrays
 
@@ -55,6 +71,12 @@ SK_ref.Append(Ebene_SK)
 SH_ref = ReferenceArray()
 SH_ref.Append(Ebene_SG)
 SH_ref.Append(Ebene_SK)
+
+Test_ref = ReferenceArray()
+Test_ref.Append(Ebene_SG)
+Test_ref.Append(Ebene_0)
+Test_ref.Append(Ebene_1)
+Test_ref.Append(Ebene_SK)
 
 """
 # Let user pick a view
@@ -79,31 +101,41 @@ print(elem.Direction)
 
 
 """
-# Pick point for dimline
+# points for dimline
 
-selected_point = selection.PickPoint("Platzieren sie die Maßlinien")
-point_2 = selected_point + XYZ(0,0,10)
-dimline = Line.CreateBound(selected_point, point_2)
+view_origin = view.Origin
+view_rdir = view.RightDirection
+view_udir = view.UpDirection
+view_cp = view.CropBox
+
+point_1 = view_cp.Max - 5 * view_rdir
+
+#point_1 = view_origin
+point_2 = point_1 + 10 * view_udir
+
+dimline = Line.CreateBound(point_1, point_2)
 
 offset = convert_internal_units(0.5, True, 'm')
-dimline_sh = dimline.CreateOffset(offset, XYZ(-1, 0, 0))
+dimline_sh = dimline.CreateOffset(offset, XYZ(1,0,0))
+dimline_test = dimline_sh.CreateOffset(offset, XYZ(1,0,0))
+
 
 # Transaction
 t = Transaction(doc, __title__)
 t.Start()
 try:
     #Changes
-    SG_Dim = doc.Create.NewDimension(doc.ActiveView, dimline, SG_ref) #type: Dimension
-    SG_Dim.Prefix = "HSG"
-
-    FH_Dim = doc.Create.NewDimension(doc.ActiveView, dimline, FH_ref)  # type: Dimension
-    FH_Dim.Prefix = "FH"
-
-    SK_Dim = doc.Create.NewDimension(doc.ActiveView, dimline, SK_ref)  # type: Dimension
-    SK_Dim.Prefix = "HSK"
 
     SH_Dim = doc.Create.NewDimension(doc.ActiveView, dimline_sh, SH_ref)  # type: Dimension
     SH_Dim.Prefix = "SH"
+
+    test_dim = doc.Create.NewDimension(doc.ActiveView, dimline, Test_ref)  # type: Dimension
+    segments = test_dim.Segments
+    count = 0
+    prefixes = ["HSG", "FH", "HSK"]
+    for seg in segments:
+        seg.Prefix = prefixes[count]
+        count += 1
 
     t.Commit()
 except:

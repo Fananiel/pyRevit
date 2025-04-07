@@ -11,7 +11,7 @@ Author: Daniel Förster"""
 #==================================================
 from Autodesk.Revit.DB import *
 from Autodesk.Revit.UI.Selection import *
-from Snippets._selection import check_type, ISelectionFilter_Categories
+from Snippets._selection import check_type, ISelectionFilter_Categories, check_family
 from pyrevit import forms
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
@@ -30,17 +30,27 @@ selection = uidoc.Selection                     #type: Selection
 
 view = doc.ActiveView
 
+if view.ViewType == ViewType.ThreeD:
+    forms.alert('Nicht in 3D möglich, bitte Ansicht oder Schnitt wählen!', exitscript=True)
+
 # Pick object
 
 filter_cats_ref = ISelectionFilter_Categories([BuiltInCategory.OST_GenericModel])
-all_allgmodel = selection.PickObjects(ObjectType.Element, filter_cats_ref, "Wählen sie die Piktgogramme!")
+all_allgmodel = selection.PickElementsByRectangle(filter_cats_ref, "Wählen sie die Piktogrammtafel!")
+ptafel = [m for m in all_allgmodel if check_family(m,"DB_Piktogrammtafel")]
+
+phalter = []
+
+for el in ptafel:
+    ph_ids = el.GetSubComponentIds()
+    for el in ph_ids:
+        phalter.append(doc.GetElement(el))
 
 # Platzhalter filtern
 #all_allgmodel   = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().ToElements()
-ph_rollstuhl    = [m for m in all_allgmodel if check_type(m,"Rollstuhl")]
-ph_aufzug       = [m for m in all_allgmodel if check_type(m,"Aufzug")]
-ph_sev       = [m for m in all_allgmodel if check_type(m,"Divers")]
-
+ph_rollstuhl    = [m for m in phalter if check_type(m,"Rollstuhl")]
+ph_aufzug       = [m for m in phalter if check_type(m,"Aufzug")]
+ph_sev       = [m for m in phalter if check_type(m,"Divers")]
 
 phs = ph_rollstuhl + ph_aufzug + ph_sev
 

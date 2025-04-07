@@ -146,7 +146,6 @@ req_params = ['Nennspannung', 'Nennfrequenz', 'Absicherung', 'Nennleistung', 'Ne
               'FF1_K', 'FF2_K',	'FF1_GGW', 'FF2_GGW',	'F1_Plan',	'F2_Plan',	'F3_Plan',	'F4_Plan',	'F5_Plan',	'F8_Plan',	'F9_Plan',
               'F10_Plan',	'F14_Plan',	'F15_Plan',	'F16_Plan',	'F17_Plan',	'F18_Plan',
               'TRAGKRAFT', 'Personenzahl', 'FOERDERHOEHE', 'Geschwindigkeit', 'Anzahl Haltestellen', 'Anzahl Schachtzugänge',
-              'PLN_Bauherr_Adresse_Zeile1', 'PLN_Bauherr_Adresse_Zeile2','PLN_Bauherr_Adresse_Zeile3',
               'Erdung_Text', 'Notruf_Text', 'Planungsgrundlage Text', 'PLN_Projektbezeichnung_Zeile1', 'PLN_Projektnummer',
               'PLN_Planungsphase', 'Planbezeichnung', 'Planart', 'PLN_Plannummer', 'Strecke_Bezeichnung', 'Strecke_Nr.', 'Stations_km', 'Bahnhofs-Nr.',
               'Planersteller', 'Datum', 'Datum Zeichner', 'CAD_Zeichner', 'CAD_Prüfer', 'CAD_Prüfer_Datum']
